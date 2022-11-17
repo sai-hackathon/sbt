@@ -520,9 +520,8 @@ contract SBT is Soulbound, Ownable {
 
     Skill[] private _skills;
     mapping(uint256 => string) _ooccupations; // sbt_id -> occupation code
-    mapping(uint256 => mapping(uint => Deviation)) private _deviations;  // sender_sbt_id -> skill_id -> 評価偏差
     mapping(uint256 => mapping(uint => uint8[])) private _points;  // sender_sbt_id -> skill_id -> 評価履歴
-    mapping(uint256 => mapping(uint => uint8[])) private _assessments; // receiver_sbt_id -> skill_id -> 評価一覧
+    mapping(uint256 => mapping(uint256 => bool)) private _evaluates;  // sender_sbt_id -> receiver_sbt_id -> 評価履歴
     mapping(uint256 => mapping(uint => uint8)) private _scores; // sbt_id -> skill_id -> 数値
 
     string private _baseURI;
@@ -595,7 +594,7 @@ contract SBT is Soulbound, Ownable {
         return _skills.length;
     }
 
-    function evaluate(uint256 _senderSbtId, uint256 _receiverSbtId, uint8[] memory _addPoints) external onlyOwner
+    function evaluate(uint256 _senderSbtId, uint256 _receiverSbtId, uint8[] memory _addPoints) external
     {
         require(_addPoints.length == 4, "invalid length");
 
@@ -606,53 +605,10 @@ contract SBT is Soulbound, Ownable {
             require(ownerOf(_senderSbtId) == address(msg.sender), "Not owner");
             require(ownerOf(_receiverSbtId) != address(0), "Not minted");
 
-            Deviation memory _deviation = _deviations[_senderSbtId][i];
-
-            // update assessment
-
-            if(_deviation.average > _point) {
-                uint256 base = uint256(_deviation.average).sub(_point).mul(10).div(_deviation.standardDeviation);
-                _assessments[_receiverSbtId][i].push(uint8(uint256(50).sub(base)));
-            } else {
-                uint256 base = uint256(_point).sub(_deviation.average).mul(10).div(_deviation.standardDeviation);
-                _assessments[_receiverSbtId][i].push(uint8(uint256(50).add(base)));
-            }
-
-            // update deviation
-
-            uint256 sum = _points[_senderSbtId][i].length.mul(_deviation.average);
             _points[_senderSbtId][i].push(_point);
-            sum += _point;
+            _evaluates[_senderSbtId][_receiverSbtId] = true;
         
-            uint16 average = uint16(sum.div(_points[_senderSbtId][i].length));
-            uint256 baseStandardDeviation = 0;
-
-            for(uint256 j = 0; j < _points[_senderSbtId][i].length; j++) {
-                if(_points[_senderSbtId][i][j] > average) {
-                    baseStandardDeviation += (_points[_senderSbtId][i][j] - average) * (_points[_senderSbtId][i][j] - average);
-                } else {
-                    baseStandardDeviation += (average - _points[_senderSbtId][i][j]) * (average - _points[_senderSbtId][i][j]);
-                }
-            }
-
-            _deviations[_senderSbtId][i].average = average;
-            _deviations[_senderSbtId][i].standardDeviation = uint16(sqrt(baseStandardDeviation.div(_points[_senderSbtId][i].length)));
         }
-    }
-
-    function assessment(uint256 _sbtId, uint _skillId) external view returns (uint256)
-    {
-
-        if(_assessments[_sbtId][_skillId].length == 0) {
-            return 50;
-        }
-
-        uint256 sum = 0;
-        for(uint8 i; i < _assessments[_sbtId][_skillId].length; i++) {
-            sum += _assessments[_sbtId][_skillId][i];
-        }
-        
-        return sum.div(_assessments[_sbtId][_skillId].length);
     }
 
     function setScore(uint256 _sbtId, uint8[] memory _addScores) external onlyOwner
@@ -678,15 +634,5 @@ contract SBT is Soulbound, Ownable {
         _ooccupations[_sbtId] = _ooccupation;
     }
 
-    function sqrt(uint256 x) internal pure returns(uint256)
-    {
-        uint256 z = x.add(1).div(2);
-        uint256 y = x;
-        while(z < y){
-        y = z;
-        z = x.div(z).add(z).div(2);
-        }
-        return y;
-    }
 
 }

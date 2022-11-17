@@ -1,14 +1,6 @@
 
 # Sai
 
-WorkerのためのSBT基盤を提出する。
+What Sai Entertainment  solves: Since the existing work history forms are self-applied, the evaluation tends to be more influenced by job search/career readiness than by intrinsic competence. This has become a factor in post-employment mismatches. In addition, existing evaluation systems often result in inappropriate information as data for third parties to refer to, as subjectivity and discovery affect the results of evaluations. Furthermore, in existing talent management systems, individual evaluation information is stored within the company and individuals do not take it out.
 
-既存の職歴書は自己申請型であるため、本質的実力よりも就活/転職準備力が評価に大きく影響される傾向にある。これが就職後のミスマッチの要因になっている。
-
-また、既存の評価システムでは主観や忖度が評価の結果に影響することから、第三者が参照するデータとして不適切な情報となるケースが多く見られる。
-
-さらに、既存のタレントマネジメントシステムでは個人の評価情報は会社内に蓄積され、個人がそれを持ち出すことはない。
-
-今回我々は、ブロックチェーンの特徴を活かすことで活動履歴及び評価情報を改竄できない状態を形成し、その情報をSBTへ紐付けることで評価情報を個人へ帰属することを可能にした。
-
-また、SBTへ紐付けられる評価情報の一部に、O*NETの「Occupational Information Network Numerical Index」に基づき各職業間の関連性と必要とされるスキルウエイトを数値化、また評価者の評価基準に偏差値要素を取り入れることで評価の正確性を担保した。このSBTによって、得意を中心にDAO及び既存企業での活動を実現していく。
+Product description: In our product, we have utilized the characteristics of the blockchain to create a state in which activity history and evaluation information cannot be tampered with, and by linking this information to the SBT, it is possible to attribute evaluation information to individuals, so that we could provide more transparency in the Job market.
